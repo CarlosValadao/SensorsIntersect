@@ -8,11 +8,17 @@
 % a funcao retorna a primeira ocorrencia de intersecao entre um
 % segmento e um dado segmento de um sensor
 function [hi, xi, yi] = intersectSegmentWithSensor(segment, sensor)
-    sensorSides = sensor.getSegments();
-    for sensorSide=sensorSides
-        [hi, xi, yi] = getSegmentsIntersection(segment, sensorSide{1});
-        if hi
-            return;
-        end
-    end
+    % sensorSides = sensor.getSegments();
+    % for sensorSide=sensorSides
+    %     [hi, xi, yi] = getSegmentsIntersection(segment, sensorSide{1});
+    %     if hi
+    %         return;
+    %     end
+    % end
+    xCoordSensor = sensor.getXPointCoordsLF;
+    yCoordSensor = sensor.getYPointCoordsLF;
+    xCoordsSegment = segment.getXCoords;
+    yCoordSegment = segment.getYCoords;
+    [xi, yi] = polyxpoly(xCoordsSegment, yCoordSegment, xCoordSensor, yCoordSensor);
+    hi = ~isempty(xi) && ~isempty(yi);
 end

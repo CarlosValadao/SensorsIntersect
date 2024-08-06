@@ -10,7 +10,7 @@ function labels = createArrayNodeLabels(prefix, nodeQuantity)
     labels = strings(1, nodeQuantity+2);
     labels(1) = "L";
     for k=2:nodeQuantity+1
-        labels(k) = sprintf("%s%d", prefix, k-1);
+        labels(k) = sprintf("%s%d", prefix, k);
     end
     labels(k+1) = "R";
 end

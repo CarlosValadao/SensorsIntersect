@@ -9,9 +9,14 @@
 
 % sensorsu = sensors updated
 function sensorsu = updateSensorPolygonPartiallyContained(sensors, sensorsIdxPartiallyContained, monitoringArea)
+    polyshapeMonitoringArea = planarPolygon2Polyshape(monitoringArea);
     for k=sensorsIdxPartiallyContained
-        [hasInter, newPolygon] = interPolygon(sensors(k), monitoringArea);
+        % [hasInter, newPolygon] = interPolygon(sensors(k), monitoringArea);
+        polyshapeSensor = planarPolygon2Polyshape(sensors(k));
+        sensorIntersect = intersect(polyshapeSensor, polyshapeMonitoringArea);
+        hasInter = ~isempty(sensorIntersect.Vertices);
         if hasInter
+            newPolygon = polyshape2PlanarPolygon(sensorIntersect);
             sensors(k) = newPolygon;
         end
     end
