@@ -1,7 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     SENSOR'S CONFIGURATION    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% nSensors = 4;
+% nVisualSensors = 4;
+% theta = 30;
+% R = 5;
+% 
 % Depende de nSensors, nVisualSensors, theta e R
 
 vSensors = cell(0);
@@ -54,7 +58,7 @@ for i=1:nSensors,
         auxVSensor.Cx = auxVSensor.Ax + R*cos(mod(auxVSensor.alfa+theta, 2*pi));
         auxVSensor.Cy = auxVSensor.Ay + R*sin(mod(auxVSensor.alfa+theta, 2*pi));
 
-        plotSensors({auxVSensor},0);
+        plotSensorsd({auxVSensor},0);
         plot(ax, ay, 'o', 'MarkerSize',10,...
                           'MarkerEdgeColor','red',...
                           'MarkerFaceColor','red');
@@ -64,7 +68,7 @@ for i=1:nSensors,
         disp([num2str(i) '. Set PLACE scalar node[' num2str(i-nVisualSensors) '].']);
 
         %for position
-        [ax ay] = ginput(1);
+        [ax, ay] = ginput(1);
         pos(i+1,:) = [ax, ay];
 
         plot(ax, ay, 'd', 'MarkerSize',10,...
@@ -74,12 +78,24 @@ for i=1:nSensors,
         disp([num2str(i) '. Set PLACE of sink node.']);
 
         %for position
-        [ax ay] = ginput(1);
+        [ax, ay] = ginput(1);
         pos(1,:) = [ax, ay]; %Index 1 is reserved for node 0 (SINK)
 
         plot(ax, ay, 's', 'MarkerSize',10,...
                           'MarkerEdgeColor','black',...
                           'MarkerFaceColor','black');
+    end
+    sizeVsensors = length(vSensors);
+    sensorA = [vSensors{1}.Ax vSensors{1}.Ay];
+    sensorB = [vSensors{1}.Bx vSensors{1}.By];
+    sensorC = [vSensors{1}.Cx vSensors{1}.Cy];
+    sensor = PlanarPolygon(sensorA, sensorB, sensorC);
+    sensorsArray = repmat(sensor, 1, sizeVsensors);
+    for k = 2:sizeVsensors
+        sensorA = [vSensors{k}.Ax vSensors{k}.Ay];
+        sensorB = [vSensors{k}.Bx vSensors{k}.By];
+        sensorC = [vSensors{k}.Cx vSensors{k}.Cy];
+        sensorsArray(k) = PlanarPolygon(sensorA, sensorB, sensorC);
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

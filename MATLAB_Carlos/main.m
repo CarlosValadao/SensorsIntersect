@@ -1,8 +1,9 @@
 closeOpenFigures();
 clearConsole();
 
-ANGLE = 60;
-NUM_SENSORS = 14;
+% degrees
+ANGLE = 30;
+NUM_SENSORS = 2;
 RS = 3;
 POV = deg2rad(ANGLE);
 
@@ -12,7 +13,8 @@ XORIGINS_MONITORING_AREA = 0;
 YORIGINS_MONITORING_AREA = 5;
 MONITORINGAREA_HEIGHT = 5;
 MONITORINGAREA_WIDTH = 10;
-
+LEFT_SIDE_OF_MONITORING_AREA = 1;
+RIGHT_SIDE_OF_MONITORING_AREA = NUM_SENSORS + 2;
 
 monitoringArea = generateMonitoringArea( ...
     XORIGINS_MONITORING_AREA, YORIGINS_MONITORING_AREA, ...
@@ -20,147 +22,94 @@ monitoringArea = generateMonitoringArea( ...
     );
 
 % Inicializando os sensores	
-sensors = randomNSensors( ...
-    POV, MONITORINGAREA_HEIGHT, MONITORINGAREA_WIDTH, RS, ...
-    NUM_SENSORS ...
-    );
+% sensors = randomNSensors( ...
+%     POV, MONITORINGAREA_HEIGHT, MONITORINGAREA_WIDTH, RS, ...
+%     NUM_SENSORS ...
+%     );
 
-figure
-title("Disposição dos Sensores na Área de Interesse");
-xlim([0 MONITORINGAREA_WIDTH + 5]);
-ylim([0 MONITORINGAREA_HEIGHT + 5]);
-grid on
-hold on
-
+% Inicializando sensores a partir da entrada do usuario
+sensorsPositionsByUserFigure = setupPlot();
 plotMonitoringArea(monitoringArea);
+sensors = placeSensorsFromUser(NUM_SENSORS, NUM_SENSORS, ANGLE, RS);
 
-% do sensor em relação à origem do P1(x,y) da àrea de interesse
-adjacencyMatrix = zeros(NUM_SENSORS + 2, NUM_SENSORS + 2);
-
+intersectionsAdjacencyMatrix = zeros(NUM_SENSORS + 2, NUM_SENSORS + 2);
 
 % Ordenando o vetor de sensores com base na distancia do ponto (Ax, Ay)
+% do sensor em relação à origem do P1(x,y) da àrea de interesse
 % ponto de origem da area de interesse
 ordSensors = sortSensorsByDist(sensors, monitoringArea.getVertex(4));
-sensorIntersections = cell(2, NUM_SENSORS);
 
-% REMOVER
-plotSensors(ordSensors, NUM_SENSORS, true);
-title("Sensores Antes do Pré-processamento!");
-figure;
-grid minor;
-hold on;
-
+notPreProcessedSensorsFigure = setupPlot();
 plotMonitoringArea(monitoringArea);
+plotSensors(ordSensors, NUM_SENSORS, true);
+title("Sensores antes do pré-processamento!");
 
-[sensorsPartiallyInMonitoringArea, idx] = getSensorsPartiallyContainedMonitoringArea( ...
+[sensorsPartiallyInMonitoringArea, idxSensorsPartiallyContained] = getSensorsPartiallyContainedMonitoringArea( ...
     ordSensors, NUM_SENSORS, monitoringArea ...
     );
     
-% Pode ser usado para saber quais sensores que podem gerar
-% uma barreira, uma vez que e plausivel a existencia da intersecao
-% de mais de um sensor, com o lado esquerdo da area de interesse
-
 leftSideOfMonitoringArea = monitoringArea.getSegments{4};
-idxSensorsLeftSideMonitoringAreaIntersections = findMonitoringAreaSideIntersections(...
+[idxSensorsLeftSideMonitoringAreaIntersections, lxi, lyi] = findMonitoringAreaSideIntersections(...
     leftSideOfMonitoringArea, ordSensors ...
     );
 
 % Atualizando a matriz de adjacencia que representa o grafo
-if length(idxSensorsLeftSideMonitoringAreaIntersections)
-    for k=idxSensorsLeftSideMonitoringAreaIntersections
-        adjacencyMatrix(1, k+1) = 1;
-        adjacencyMatrix(k+1, 1) = 1;
+if isnotempty(idxSensorsLeftSideMonitoringAreaIntersections)
+    for idx=idxSensorsLeftSideMonitoringAreaIntersections
+        intersectionsAdjacencyMatrix(1, idx+1) = 1;
+        intersectionsAdjacencyMatrix(idx+1, 1) = 1;
     end
 end
 
 rightSideOfMonitoringArea = monitoringArea.getSegments{2};
-idxSensorsRightSideMonitoringAreaIntersections = findMonitoringAreaSideIntersections( ...
+[idxSensorsRightSideMonitoringAreaIntersections, rxi, ryi] = findMonitoringAreaSideIntersections( ...
     rightSideOfMonitoringArea, ordSensors);
 
-if length(idxSensorsRightSideMonitoringAreaIntersections)
-    for k=idxSensorsRightSideMonitoringAreaIntersections
-        adjacencyMatrix(NUM_SENSORS+2, k+1) = 1;
-        adjacencyMatrix(k+1, NUM_SENSORS+2) = 1;
+% Atualizando a matriz de adjacencia que representa o grafo
+if isnotempty(idxSensorsRightSideMonitoringAreaIntersections)
+    for idx=idxSensorsRightSideMonitoringAreaIntersections
+        intersectionsAdjacencyMatrix(NUM_SENSORS+2, idx+1) = 1;
+        intersectionsAdjacencyMatrix(idx+1, NUM_SENSORS+2) = 1;
     end
 end
 
-% fprintf("\t Sensores Parcialmente na area de interesse ->\n");
-% disp(idx);
-% % disp(["    ->", sensorsPartiallyInMonitoringArea]);
-% disp(sensorsPartiallyInMonitoringArea);
+[upToDateSensors, xinters, yinters] = updateSensorPolygonPartiallyContained(ordSensors, ...
+                            idxSensorsPartiallyContained, monitoringArea);
 
-upToDateSensors = updateSensorPolygonPartiallyContained(ordSensors, idx, monitoringArea);
-
-
+preProcessedSensorsFigure = setupPlot();
+plotMonitoringArea(monitoringArea);
 plotSensors(upToDateSensors, NUM_SENSORS, true);
-% plotSensors(upToDateSensors, -1);
-title("Sensores Depois do pre-processamento");
+% pontos de intersecao com o lado esquerdo e direito
+% da area de interesse
+plot(lxi, lyi, 'ms', 'LineWidth', 4);
+plot(rxi, ryi, 'ms', 'LineWidth', 4);
+% pontos de intersecao dos poligonos parcialmente contidos
+% na area de interesse
+plot(xinters, yinters, 'ms', 'LineWidth', 4);
+title("Sensores depois do pré-processamento!");
+
 
 % Calcula a intersecao entre os sensores
+% de todos para todos
 for l = 1:NUM_SENSORS - 1
-	disp("-------------------START INTERSECTION-----------------------");
     for m = 1:NUM_SENSORS
         if l ~= m
-            [hasIntersection, xIntersectionPoint, yIntersectionPoint] = getSensorsIntersection(upToDateSensors(l), upToDateSensors(m));
+            [hasIntersection, xIntersectionPoint, yIntersectionPoint] = getSensorsIntersection( ...
+                                                            upToDateSensors(l), upToDateSensors(m));
             if hasIntersection
-				adjacencyMatrix(l+1, m+1) = 1;
-				adjacencyMatrix(m+1, l+1) = 1;
-                xIntersectionPoint
-                yIntersectionPoint
-                sensorIntersections{1, l} = xIntersectionPoint;
-                sensorIntersections{2, l} = yIntersectionPoint;
-                plot(xIntersectionPoint, yIntersectionPoint, 'ms', 'LineWidth', 3);
-            else
-                fprintf("\nNAO TEVE INTERSECAO\n");
+				intersectionsAdjacencyMatrix(l+1, m+1) = 1;
+				intersectionsAdjacencyMatrix(m+1, l+1) = 1;
+                plot(xIntersectionPoint, yIntersectionPoint, 'ms', 'LineWidth', 4);
             end
         end
     end
-	disp("-------------------END INTERSECTION-----------------------");
 end
 
-
-% for l = 1:NUM_SENSORS
-% 	[hasIntersection, xIntersectionPoint, yIntersectionPoint] = getSensorsIntersection(monitoringArea, upToDateSensors(l));
-% 	if hasIntersection
-% 		plot(xIntersectionPoint, yIntersectionPoint, 'ms', 'LineWidth', 3);
-% 	else
-% 		fprintf("\nNAO TEVE INTERSECAO\n");
-% 	end
-% end
-
-
-% for l=1:NUM_SENSORS-1
-%     for m=1:NUM_SENSORS
-%         if l ~= m
-%             [hi, pol] = interPolygon(upToDateSensors(l), upToDateSensors(m));
-%             if hi
-%                 fill(pol.getXPointCoordsLF, pol.getYPointCoordsLF, 'r');
-%             end
-%         end
-%     end
-% end
-
-% names = createArrayNodeLabels("s", NUM_SENSORS);
-
-figure
-adjacencyMatrix
-left2RightPaths = findAllPaths(adjacencyMatrix, 1, NUM_SENSORS+2);
-fprintf("EXISTEM %s CAMINHOS ENTRE L E R\n", num2str(length(left2RightPaths)));
+intersectionsGraphFigure = setupPlot();
+left2RightSidePaths = findAllPaths(intersectionsAdjacencyMatrix, ...
+    LEFT_SIDE_OF_MONITORING_AREA, RIGHT_SIDE_OF_MONITORING_AREA);
+fprintf("EXISTE(M) %s CAMINHO(S) ENTRE L E R\n", num2str(length(left2RightSidePaths)));
 graphLabels = createArrayNodeLabels(SENSOR_LABEL_PREFFIX, NUM_SENSORS);
-grah = graph(adjacencyMatrix, graphLabels);
-plot(grah);
-
-% path = dfsearch(grah, 1);
-% path
-
-% figure
-% hold on
-% grid minor
-% plotMonitoringArea(monitoringArea);
-% for n=path'
-%     x = upToDateSensors(n).getXPointCoordsLF;
-%     y = upToDateSensors(n).getYPointCoordsLF;
-%     fill(x, y, 'r');
-% end
-
-% title("Grafo a Partir das Interseções dos Sensores");
+intersectionsGraph = graph(intersectionsAdjacencyMatrix, graphLabels);
+plot(intersectionsGraph);
+title("Grafo de interseções!");
