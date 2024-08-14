@@ -97,6 +97,5 @@ function sensorsArray = placeSensorsFromUser(nSensors, nVisualSensors, theta, R)
             sensorsArray(k) = PlanarPolygon(sensorA, sensorB, sensorC);
         end
     end
-    close;
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

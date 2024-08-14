@@ -42,12 +42,12 @@ function [sensorsUpToDate, xi, yi] = updateSensorPolygonPartiallyContained(senso
         % um poligono nao convexo em apenas dois pontos
         % logo o vetor de intersecao tera sempre apenas
         % dois pontos
-        xCoordIntersectPolygon
-        yCoordIntersectPolygon
-        xCoordCurrentSensor
-        yCoordCurrentSensor
-        xCoordIntersectionPoints
-        yCoordIntersectionPoints
+        % xCoordIntersectPolygon
+        % yCoordIntersectPolygon
+        % xCoordCurrentSensor
+        % yCoordCurrentSensor
+        % xCoordIntersectionPoints
+        % yCoordIntersectionPoints
         xi(counter) = xCoordIntersectionPoints(1);
         xi(counter+1) = xCoordIntersectionPoints(2);
         yi(counter) = yCoordIntersectionPoints(1);

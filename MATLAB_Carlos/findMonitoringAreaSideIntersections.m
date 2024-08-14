@@ -10,12 +10,17 @@
 function [IdxSensorsLeftSideInter, xi, yi] = findMonitoringAreaSideIntersections(monitoringAreaSide, sensors)
     sensorsSize = length(sensors);
     counter = 0;
+    xi = [];
+    yi = [];
     IdxSensorsLeftSideInter = uint8(1:sensorsSize);
     for k=1:sensorsSize
-        [hi, xi, yi] = intersectSegmentWithSensor(monitoringAreaSide, sensors(k));
+        [hi, txi, tyi] = intersectSegmentWithSensor(monitoringAreaSide, sensors(k));
         if ~hi
             IdxSensorsLeftSideInter(k-counter) = [];
             counter = counter + 1;
+        else
+            xi = horzcat(xi, txi');
+            yi = horzcat(yi, tyi');
         end
     end
 end
