@@ -84,18 +84,26 @@ function sensorsArray = placeSensorsFromUser(nSensors, nVisualSensors, theta, R)
                             'MarkerEdgeColor','black',...
                             'MarkerFaceColor','black');
         end
-        sizeVsensors = length(vSensors);
-        sensorA = [vSensors{1}.Ax vSensors{1}.Ay];
-        sensorB = [vSensors{1}.Bx vSensors{1}.By];
-        sensorC = [vSensors{1}.Cx vSensors{1}.Cy];
-        sensor = PlanarPolygon(sensorA, sensorB, sensorC);
-        sensorsArray = repmat(sensor, 1, sizeVsensors);
-        for k = 2:sizeVsensors
-            sensorA = [vSensors{k}.Ax vSensors{k}.Ay];
-            sensorB = [vSensors{k}.Bx vSensors{k}.By];
-            sensorC = [vSensors{k}.Cx vSensors{k}.Cy];
-            sensorsArray(k) = PlanarPolygon(sensorA, sensorB, sensorC);
-        end
+    end
+    % vSensors{1}
+    % vSensors{2}
+    sizeVsensors = length(vSensors);
+    sensorA = [vSensors{1}.Ax vSensors{1}.Ay];
+    sensorB = [vSensors{1}.Bx vSensors{1}.By];
+    sensorC = [vSensors{1}.Cx vSensors{1}.Cy];
+    sensorAlpha = vSensors{1}.alfa;
+    sensorTheta = theta;
+    sensorRs = R;
+    sensor = Sensor(sensorA, sensorB, sensorC, ...
+                    sensorTheta, sensorAlpha, sensorRs);
+    sensorsArray = repmat(sensor, 1, sizeVsensors);
+    for k = 2:sizeVsensors
+        sensorA = [vSensors{k}.Ax vSensors{k}.Ay];
+        sensorB = [vSensors{k}.Bx vSensors{k}.By];
+        sensorC = [vSensors{k}.Cx vSensors{k}.Cy];
+        sensorAlpha = vSensors{k}.alfa;
+        sensorsArray(k) = Sensor(sensorA, sensorB, sensorC, ...
+                                 sensorTheta, sensorAlpha, sensorRs);
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

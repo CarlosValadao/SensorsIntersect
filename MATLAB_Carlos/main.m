@@ -1,12 +1,23 @@
+%%
 closeAllFigures();
 clearConsole();
 
 % degrees
 ANGLE = 30;
-NUM_SENSORS = 7;
-RS = 3;
 POV = deg2rad(ANGLE);
 
+NUM_SENSORS = 2;
+RS = 3;
+%theta
+
+LOW_COVERAGE_QUALITY = 3;
+MEDIUM_COVERAGE_QUALITY = 2;
+HIGH_COVERAGE_QUALITY = 1;
+
+MONITORING_BLOCK_WIDTH = 0.5/2;
+MONITORING_BLOCK_HEIGHT = 0.625/4;
+
+% NAO ALTERAR (POR ENQUANTO)
 INPUT_METHOD = "FromUser";
 SENSOR_LABEL_PREFFIX = '';
 THETA_MONITORING_AREA = 0;
@@ -22,10 +33,18 @@ monitoringArea = generateMonitoringArea( ...
     MONITORINGAREA_WIDTH, MONITORINGAREA_HEIGHT, THETA_MONITORING_AREA ...
     );
 
+% monitoringAreaFromMonitoringBlocks e uma matriz bidimensional
+% de MonitoringBlocks
+monitoringAreaFromMonitoringBlocks = randomNMonitoringBlocks(XORIGINS_MONITORING_AREA, ...
+                                     YORIGINS_MONITORING_AREA, MONITORINGAREA_WIDTH, ...
+                                     MONITORINGAREA_HEIGHT, THETA_MONITORING_AREA, ...
+                                     MONITORING_BLOCK_WIDTH, MONITORING_BLOCK_HEIGHT);
+
 % Inicializando os sensores
 sensors = generateSensors(INPUT_METHOD, POV, MONITORINGAREA_HEIGHT, ...
                             MONITORINGAREA_WIDTH, RS, NUM_SENSORS, monitoringArea);
-                            
+%%
+
 intersectionsAdjacencyMatrix = zeros(NUM_SENSORS + 2, NUM_SENSORS + 2);
 
 % Ordenando o vetor de sensores com base na distancia do ponto (Ax, Ay)
@@ -92,7 +111,6 @@ plotSensors(upToDateSensors, NUM_SENSORS, true);
 % na area de interesse
 % plot(xinters, yinters, 'ms', 'LineWidth', 4);
 title("Sensores depois do pré-processamento");
-
 
 % Calcula a intersecao entre os sensores
 % de todos para todos
