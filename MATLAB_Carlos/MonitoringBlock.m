@@ -39,5 +39,17 @@ classdef MonitoringBlock < PlanarPolygon
                 obj.isCovered = true;
             end
         end
+
+        function isEqual = eq(mb1, mb2)
+            if isscalar(mb1) && isscalar(mb2)
+                xBaricenterEqual = mb1.xBaricenter == mb2.xBaricenter;
+                yBaricenterEqual = mb1.yBaricenter == mb2.yBaricenter;
+                isEqual = xBaricenterEqual && yBaricenterEqual;
+            else
+                mb2 = repmat(mb2, size(mb1));
+                sameMonitoringBlock = @(x, y) (x.xBaricenter == y.xBaricenter) && (x.yBaricenter == y.yBaricenter);
+                isEqual = arrayfun(sameMonitoringBlock, mb1, mb2);
+            end
+        end
     end
 end

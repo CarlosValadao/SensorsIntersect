@@ -25,9 +25,15 @@ classdef Sensor < PlanarPolygon
         foVYPoints
 
         foVPolyshapes
+
+        % arrays de MonitoringBlocks
+        lowQualityCoveredBlocks = [];
+        mediumQualityCoveredBlocks = [];
+        highQualityCoveredBlocks = [];
         % theta
         % alpha
         % RS
+        coveredBlocks = cell(1, 3);
     end
 
     methods
@@ -83,6 +89,9 @@ classdef Sensor < PlanarPolygon
             obj.foVXPoints = [Dx, Ex, Fx, Gx];
             obj.foVYPoints = [Dy, Ey, Fy, Gy];
             obj.foVPolyshapes = [ obj.foVL1Polyshape obj.foVL2Polyshape obj.foVL3Polyshape ];
+            % obj.coveredBlocks{1} = cell(1, 3);
+            % obj.coveredBlocks{2} = cell(1, 3);
+            % obj.coveredBlocks{3} = cell(1, 3);
         end
 
         function fovL1XVertices = getFoVL1XVertices(obj)
@@ -108,28 +117,66 @@ classdef Sensor < PlanarPolygon
         function fovL3YVertices = getFoVL3YVertices(obj)
             fovL3YVertices = obj.foVL3Polyshape.Vertices(:,2)';
         end
-    end
 
-    % methods (Access = private)
-    %     function [x, y] = calcCoordinatesPointD(Ax, Ay, AD, alpha)
-    %         fprintf("WHATS WRONG WITH YOU\n");
-    %         x = Ax + AD * cos(alpha);
-    %         y = Ay + AD * sin(alpha);
-    %     end
+        function polyshapes = getFoVPolyshapes(obj)
+            polyshapes = obj.foVPolyshapes;
+        end
 
-    %     function [x, y] = calcCoordinatesPointE(Ax, Ay, AD, alpha, theta)
-    %         x = Ax + AD * cos(mod(alpha + theta, 2*pi));
-    %         y = Ay + AD * sin(mod(alpha + theta, 2*pi));
-    %     end
+        function addLowCoverageQualityBlocks(obj, monitoringBlock)
+            obj.lowQualityCoveredBlocks = [ obj.lowQualityCoveredBlocks monitoringBlock ];
+            obj.coveredBlocks{3} = obj.lowQualityCoveredBlocks;
+        end
 
-    %     function [x, y] = calcCoordinatesPointF(Ax, Ay, AF, alpha)
-    %         x = Ax + AF * cos(alpha);
-    %         y = Ay + AF * sin(alpha);
-    %     end
+        function addMediumCoverageQualityBlocks(obj, monitoringBlock)
+            obj.mediumQualityCoveredBlocks = [ obj.mediumQualityCoveredBlocks monitoringBlock ];
+            obj.coveredBlocks{2} = obj.mediumQualityCoveredBlocks;
+        end
 
-    %     function [x, y] = calcCoordinatesPointG(Ax, Ay, AF, alpha, theta)
-    %         x = Ax + AF * cos(mod(theta + alpha, 2*pi));
-    %         y = Ay + AF * sin(mod(theta + alpha, 2*pi));
-    %     end
-    % end % end methods private
+        function addHighCoverageQualityBlocks(obj, monitoringBlock)
+            obj.highQualityCoveredBlocks = [ obj.highQualityCoveredBlocks monitoringBlock ];
+            obj.coveredBlocks{1} = obj.highQualityCoveredBlocks;
+        end
+
+        function removeLowCoverageQualityBlocks(obj, monitoringBlock)
+            monitoringBlockIdx = find(obj.lowQualityCoveredBlocks == monitoringBlock);
+            obj.lowQualityCoveredBlocks(monitoringBlockIdx) = [];
+            obj.coveredBlocks{3}(monitoringBlockIdx) = [];
+        end
+
+        function removeMediumCoverageQualityBlocks(obj, monitoringBlock)
+            monitoringBlockIdx = find(obj.mediumQualityCoveredBlocks == monitoringBlock);
+            obj.mediumQualityCoveredBlocks(monitoringBlockIdx) = [];
+            obj.coveredBlocks{2}(monitoringBlockIdx) = [];
+        end
+
+        function removeHighQualityCoverageBlocks(obj, monitoringBlock)
+            monitoringBlockIdx = find(obj.highQualityCoveredBlocks == monitoringBlock);
+            obj.highQualityCoveredBlocks(monitoringBlockIdx) = [];
+            obj.coveredBlocks{1}(monitoringBlockIdx) = [];
+        end
+
+        function addBlockCoverage(obj, coverageQuality, monitoringBlock)
+            if coverageQuality == 1
+                obj.addHighCoverageQualityBlocks(monitoringBlock);
+            elseif coverageQuality == 2
+                obj.addMediumCoverageQualityBlocks(monitoringBlock);
+            elseif coverageQuality == 3
+                obj.addLowCoverageQualityBlocks(monitoringBlock);
+            else
+                exit("ERRO AO ADICIONAR MONITORING BLOCK EM UM SENSOR");
+            end
+        end
+
+        function monitoringBlock = removeBlockCoverage(obj, coverageQuality, monitoringBlock)
+            if coverageQuality == 1
+                obj.removeHighQualityCoverageBlocks(monitoringBlock);
+            elseif coverageQuality == 2
+                obj.removeMediumCoverageQualityBlocks(monitoringBlock);
+            elseif coverageQuality == 3
+                obj.removeLowCoverageQualityBlocks(monitoringBlock);
+            else
+                exit("ERRO AO REMOVER UM MONITORING BLOCK DA COBERTURA DO SENSOR");
+            end
+        end
+    end % end methods
 end

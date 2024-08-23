@@ -4,7 +4,7 @@
 function plotMonitoringAreaFromMonitoringBlocks(monitoringBlocks)
     title("Area de monitoramento a partir dos blocos de monitoramento");
     [m, n] = size(monitoringBlocks);
-    pointSize = (1/(m*n))*300;
+    pointSize = (1/(m*n))*700;
     for k=1:m
         for l=1:n
             plotMonitoringBlock(monitoringBlocks(k, l), pointSize);

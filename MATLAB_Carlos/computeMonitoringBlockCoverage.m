@@ -12,21 +12,24 @@
 % coveredBlocks - Uma matriz nSensorsx3 que guarda, para cada sensor
 % a quantidade de blocos cobertos, com qualidade alta - posicao 1 -,
 % media - posicao 2 -, e baixa, posicao 3 de cada linha do array
-function [monitoringBlockCoverages, coveredBlocks] = computeMonitoringBlockCoverage(monitoringBlocks, sensors)
-    monitoringBlockCoverages = monitoringBlocks;
-    [m, n] = size(monitoringBlockCoverages);
+% Procurar um melhor nome para o retorno `newSensors`
+function [newSensors] = computeMonitoringBlockCoverage(monitoringBlocks, sensors)
+    % monitoringBlocks = monitoringBlocks;
+    [m, n] = size(monitoringBlocks);
     o = length(sensors);
-    coveredBlocks = zeros(o, 3);
+    % coveredBlocks = zeros(o, 3);
     for k = 1:m
         for l = 1:n
             for q=1:o
                 [monitoringBlockInside, coverageQuality] = monitoringBlockInSensor(...
-                                                        monitoringBlockCoverages(k, l), sensors(q));
+                                                        monitoringBlocks(k, l), sensors(q));
                 if monitoringBlockInside
-                    monitoringBlockCoverages(k, l).addCoverage(q, coverageQuality);
-                    coveredBlocks(q, coverageQuality) = coveredBlocks(q, coverageQuality) + 1;
+                    % monitoringBlockCoverages(k, l).addCoverage(q, coverageQuality);
+                    % coveredBlocks(q, coverageQuality) = coveredBlocks(q, coverageQuality) + 1;
+                    sensors(q).addBlockCoverage(coverageQuality, monitoringBlocks(k, l));
                 end
             end
         end
     end
+    newSensors = sensors;
 end
