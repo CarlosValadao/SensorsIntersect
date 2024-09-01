@@ -7,6 +7,6 @@
 % a serem plotados
 function plotSensorsFromFoV(sensors)
     for sensor=sensors
-        plotSensorsFromFoV(sensor);
+        plotSensorFromFoV(sensor);
     end
 end

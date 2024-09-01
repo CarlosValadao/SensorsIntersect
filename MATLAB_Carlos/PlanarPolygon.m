@@ -126,6 +126,19 @@ classdef PlanarPolygon < handle
         function isNotVertexPoint = isNotVertex(obj, point)
             isNotVertexPoint = ~(obj.isVertex(point));
         end
+
+        function renew(obj, varargin)
+            fprintf("%d\n", nargin-1);
+            if nargin-1 >= 3
+                obj.vertices = varargin;
+                [obj.xvertices, obj.yvertices] = splitXYCoordinates(varargin);
+                obj.nvertices = nargin-1;
+                obj.sides = generateSides(obj, varargin);
+                %obj.sides = generateSides(varargin);
+            else
+                error("[ERROR] -> nvertices shoud be more than 2");
+            end
+        end
         % iseq e uma variavel booleana
         % compara dois poligonos com base nas posicoes
         % de seus vertices no plano cartesiano

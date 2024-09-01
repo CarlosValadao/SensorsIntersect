@@ -6,7 +6,7 @@ clearConsole();
 ANGLE = 30;
 POV = deg2rad(ANGLE);
 
-NUM_SENSORS = 2;
+NUM_SENSORS = 8;
 RS = 3;
 %theta
 
@@ -123,7 +123,8 @@ for l = 1:NUM_SENSORS - 1
             if hasIntersection
 				intersectionsAdjacencyMatrix(l+1, m+1) = 1;
 				intersectionsAdjacencyMatrix(m+1, l+1) = 1;
-                plot(xIntersectionPoint, yIntersectionPoint, 'ms', 'LineWidth', 4);
+                plot(xIntersectionPoint, yIntersectionPoint, 'ms', 'LineWidth', 4, ...
+                    'MarkerFaceColor', 'k');
             end
         end
     end
@@ -154,3 +155,11 @@ if numLeft2RightSidePaths > 0
                                 num2str(barrierId));
     title(customPolygonBarrierTitle);
 end
+
+%%
+setupPlot();
+computeMonitoringBlockCoverage(monitoringAreaFromMonitoringBlocks, upToDateSensors);
+plotMonitoringAreaFromMonitoringBlocks(monitoringAreaFromMonitoringBlocks);
+plotSensors(upToDateSensors, NUM_SENSORS, true);
+plotSensorsFromFoV(upToDateSensors);
+plotSensorsFromMonitoringBlock(upToDateSensors);

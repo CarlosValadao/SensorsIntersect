@@ -10,12 +10,8 @@
 % yi - Conjunto de coordenadas y dos pontos de intersecao
 
 % sensorsu = sensors updated
-function [sensorsUpToDate, xi, yi] = updateSensorPolygonPartiallyContained(sensors, sensorsIdxPartiallyContained, monitoringArea)
+function [sensorsUpToDate] = updateSensorPolygonPartiallyContained(sensors, sensorsIdxPartiallyContained, monitoringArea)
     polyshapeMonitoringArea = planarPolygon2Polyshape(monitoringArea);
-    sizeSensors = length(sensorsIdxPartiallyContained);
-    xi = zeros(1, 2*sizeSensors);
-    yi = zeros(1, 2*sizeSensors);
-    counter = 1;
     % xi = [];
     % yi = [];
     for k=sensorsIdxPartiallyContained
@@ -26,33 +22,15 @@ function [sensorsUpToDate, xi, yi] = updateSensorPolygonPartiallyContained(senso
         verticesSensorIntersect = sensorIntersect.Vertices;
         hasInter = ~isempty(verticesSensorIntersect);
         if hasInter
-            newPolygon = polyshape2PlanarPolygon(sensorIntersect);
-            sensors(k) = newPolygon;
+            % newPolygon = polyshape2PlanarPolygon(sensorIntersect);
+            % polyshapePolygonVertices = sensorIntersect.Vertices;
+            sizePolyshapeUnionVertices = size(verticesSensorIntersect, 1);
+            polyshapePolygonPoints = mat2cell(verticesSensorIntersect, ...
+                                     ones(sizePolyshapeUnionVertices, 1), 2);
+            updateSensorFoVLevels(sensorIntersect, sensors(k));
+            sensors(k).renew(polyshapePolygonPoints{:});
+            % sensors(k) = newPolygon;
         end
-        % Identificando os pontos de intersecao
-        xCoordCurrentSensor = currentSensor.getXPointCoords();
-        yCoordCurrentSensor = currentSensor.getYPointCoords();
-        xCoordIntersectPolygon = verticesSensorIntersect(:,1);
-        yCoordIntersectPolygon = verticesSensorIntersect(:,2);
-        xCoordIntersectionPoints = setdiffWithRepetition(xCoordIntersectPolygon', xCoordCurrentSensor);
-        yCoordIntersectionPoints = setdiffWithRepetition(yCoordIntersectPolygon', yCoordCurrentSensor);
-        % xi = horzcat(xi, xCoordIntersectionPoints);
-        % yi = horzcat(yi, yCoordIntersectionPoints);
-        % Levando em consideracao que uma reta intersecta
-        % um poligono nao convexo em apenas dois pontos
-        % logo o vetor de intersecao tera sempre apenas
-        % dois pontos
-        % xCoordIntersectPolygon
-        % yCoordIntersectPolygon
-        % xCoordCurrentSensor
-        % yCoordCurrentSensor
-        % xCoordIntersectionPoints
-        % yCoordIntersectionPoints
-        xi(counter) = xCoordIntersectionPoints(1);
-        xi(counter+1) = xCoordIntersectionPoints(2);
-        yi(counter) = yCoordIntersectionPoints(1);
-        yi(counter+1) = yCoordIntersectionPoints(2);
-        counter = counter + 1;
     end
     sensorsUpToDate = sensors;
 end

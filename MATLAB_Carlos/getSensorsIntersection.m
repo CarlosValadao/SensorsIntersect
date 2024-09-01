@@ -30,13 +30,19 @@
 % os segmentos de reta
 
 function [hasIntersection, x, y] = getSensorsIntersection(sensor1, sensor2)
-    polyshapeSensor1 = planarPolygon2Polyshape(sensor1);
-    polyshapeSensor2 = planarPolygon2Polyshape(sensor2);
-    sensorIntersect = intersect(polyshapeSensor1, polyshapeSensor2);
-    sensorIntersectVertices = sensorIntersect.Vertices;
-    hasIntersection = ~isempty(sensorIntersectVertices);
-    x = sensorIntersectVertices(:,1);
-    y = sensorIntersectVertices(:,2);
+    % polyshapeSensor1 = planarPolygon2Polyshape(sensor1);
+    % polyshapeSensor2 = planarPolygon2Polyshape(sensor2);
+    % sensorIntersect = intersect(polyshapeSensor1, polyshapeSensor2);
+    % sensorIntersectVertices = sensorIntersect.Vertices;
+    % hasIntersection = ~isempty(sensorIntersectVertices);
+    % x = sensorIntersectVertices(:,1);
+    % y = sensorIntersectVertices(:,2);
+    sensor1XV = sensor1.getXPointCoordsLF();
+    sensor1YV = sensor1.getYPointCoordsLF();
+    sensor2XV = sensor2.getXPointCoordsLF();
+    sensor2YV = sensor2.getYPointCoordsLF();
+    [x, y] = polyxpoly(sensor1XV, sensor1YV, sensor2XV, sensor2YV);
+    hasIntersection = ~(isempty([x y]));
 end
 
 % x e y sairao como dosi vetores de celula 

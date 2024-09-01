@@ -72,11 +72,6 @@ classdef Sensor < PlanarPolygon
             Fy = obj.Ay + AF * sin(alpha);
             Gx = obj.Ax + AF * cos(mod(theta + alpha, 2*pi));
             Gy = obj.Ay + AF * sin(mod(theta + alpha, 2*pi));
-
-            % [Dx, Dy] = calcCoordinatesPointD(obj.Ax, obj.Ay, AD, alpha);
-            % [Ex, Ey] = calcCoordinatesPointE(obj.Ax, obj.Ay, AD, alpha, theta);
-            % [Fx, Fy] = calcCoordinatesPointF(obj.Ax, obj.Ay, AF, alpha);
-            % [Gx, Gy] = calcCoordinatesPointG(obj.Ax, obj.Ay, AF, alpha, theta);
             obj.foVL1XV = [obj.Ax, Gx, Fx];
             obj.foVL1YV = [obj.Ay, Gy, Fy];
             obj.foVL1Polyshape = polyshape(obj.foVL1XV, obj.foVL1YV);
@@ -89,9 +84,6 @@ classdef Sensor < PlanarPolygon
             obj.foVXPoints = [Dx, Ex, Fx, Gx];
             obj.foVYPoints = [Dy, Ey, Fy, Gy];
             obj.foVPolyshapes = [ obj.foVL1Polyshape obj.foVL2Polyshape obj.foVL3Polyshape ];
-            % obj.coveredBlocks{1} = cell(1, 3);
-            % obj.coveredBlocks{2} = cell(1, 3);
-            % obj.coveredBlocks{3} = cell(1, 3);
         end
 
         function fovL1XVertices = getFoVL1XVertices(obj)
@@ -177,6 +169,18 @@ classdef Sensor < PlanarPolygon
             else
                 exit("ERRO AO REMOVER UM MONITORING BLOCK DA COBERTURA DO SENSOR");
             end
+        end
+
+        function setFoVL1Polyshape(obj, fovPolyshape)
+            obj.foVL1Polyshape = fovPolyshape;
+        end
+        
+        function setFoVL2Polyshape(obj, fovPolyshape)
+            obj.foVL2Polyshape = fovPolyshape;
+        end
+
+        function setFoVL3Polyshape(obj, fovPolyshape)
+            obj.foVL3Polyshape = fovPolyshape;
         end
     end % end methods
 end
