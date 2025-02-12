@@ -1,4 +1,4 @@
-function AQMrel = calculateAQMrel(barrier, sensors)
+function AQMrel = calculateBarrierAQMrel(barrier, sensors)
     % calculateAQMrel calcula o índice de qualidade relativa do ar (AQMrel) para uma barreira
     % com base na cobertura de blocos de diferentes qualidades (baixa, média, alta).
     % 
