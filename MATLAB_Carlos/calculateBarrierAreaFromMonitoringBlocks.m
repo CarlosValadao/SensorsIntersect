@@ -1,4 +1,4 @@
-function barrierArea = computeBarrierArea(barrierPath, sensors, mb_width, mb_height)
+function barrierArea = calculateBarrierAreaFromMonitoringBlocks(barrierPath, sensors, mb_width, mb_height)
     % COMPUTEBARRIERAREA Calcula a área total coberta por sensores ao longo de uma barreira.
     %   barrierArea = COMPUTEBARRIERAREA(barrierPath, sensors, mb_width, mb_height)
     %   calcula a área total coberta pelos sensores posicionados ao longo da barreira.
